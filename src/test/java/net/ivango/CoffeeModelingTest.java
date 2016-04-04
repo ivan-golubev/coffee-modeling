@@ -1,6 +1,8 @@
 package net.ivango;
 
 import net.ivango.components.QueueFiller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -14,30 +16,40 @@ public class CoffeeModelingTest {
 
     private QueueFiller queueFiller;
 
+    private Logger logger = LoggerFactory.getLogger(CoffeeModelingTest.class);
+
     @BeforeClass
     public void init() { queueFiller = new QueueFiller(); }
 
     @Test
     public void test100() {
         CoffeeModeling cm = new CoffeeModeling();
-        cm.launch(queueFiller.generateRandomCustomers(100));
+        int count = 100;
+        logger.info("Running test, programmers count: " + count);
+        cm.launch(queueFiller.generateRandomCustomers(count));
     }
 
     @Test
     public void test200() {
         CoffeeModeling cm = new CoffeeModeling();
-        cm.launch(queueFiller.generateRandomCustomers(200));
+        int count = 200;
+        logger.info("Running test, programmers count: " + count);
+        cm.launch(queueFiller.generateRandomCustomers(count));
     }
 
     @Test
     public void test500() {
         CoffeeModeling cm = new CoffeeModeling();
-        cm.launch(queueFiller.generateRandomCustomers(500));
+        int count = 500;
+        logger.info("Running test, programmers count: " + count);
+        cm.launch(queueFiller.generateRandomCustomers(count));
     }
 
     @Test
     public void test1000() {
         CoffeeModeling cm = new CoffeeModeling();
-        cm.launch(queueFiller.generateRandomCustomers(1000));
+        int count = 1000;
+        logger.info("Running test, programmers count: " + count);
+        cm.launch(queueFiller.generateRandomCustomers(count));
     }
 }

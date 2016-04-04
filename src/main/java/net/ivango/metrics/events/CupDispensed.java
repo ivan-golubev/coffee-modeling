@@ -3,6 +3,8 @@ package net.ivango.metrics.events;
 import net.ivango.entities.CoffeeType;
 
 /**
+ * Event used to track the dispensed cups.
+ *
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
  */
 public class CupDispensed implements Event {

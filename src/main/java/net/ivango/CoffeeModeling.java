@@ -7,10 +7,10 @@ import net.ivango.entities.Cup;
 import net.ivango.entities.Programmer;
 import net.ivango.metrics.EventProcessor;
 import net.ivango.metrics.events.CustomerServiced;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.*;
@@ -196,7 +196,7 @@ public class CoffeeModeling {
                     doneSignal.countDown();
 
                     /* submit an event: customer services – for a later report */
-                    eventProcessor.submitEvent(new CustomerServiced(programmer.getServiceStart(), DateTime.now()));
+                    eventProcessor.submitEvent(new CustomerServiced(programmer.getServiceStart(), LocalDateTime.now()));
                 }
             } catch (InterruptedException ie) {
                 logger.info("Pick Coffee worker thread interrupted.");
