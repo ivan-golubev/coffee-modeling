@@ -7,6 +7,8 @@ import net.ivango.entities.Programmer;
 import net.ivango.metrics.EventProcessor;
 import net.ivango.metrics.events.CustomerServised;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
@@ -20,17 +22,20 @@ public class CoffeeModeling {
 
     public static final int COFFEE_SELECT_PARALLELISM = 10, PAYMENT_PARALLELISM = 5, PICK_COFFEE_PARALLELISM = 2;
 
-    private BlockingQueue<Programmer> paymentQueue = new LinkedBlockingDeque<>(), dispenseQueue = new LinkedBlockingDeque<>();
-
-    private ExecutorService coffeeSelectionThreadPool = Executors.newFixedThreadPool(COFFEE_SELECT_PARALLELISM);
-    private ExecutorService paymentThreadPool = Executors.newFixedThreadPool(PAYMENT_PARALLELISM);
-    private ExecutorService pickCoffeeThreadPool = Executors.newFixedThreadPool(PICK_COFFEE_PARALLELISM);
+    private ExecutorService coffeeSelectionThreadPool = Executors.newFixedThreadPool(COFFEE_SELECT_PARALLELISM),
+                            paymentThreadPool = Executors.newFixedThreadPool(PAYMENT_PARALLELISM),
+                            pickCoffeeThreadPool = Executors.newFixedThreadPool(PICK_COFFEE_PARALLELISM);
 
     private CountDownLatch doneSignal;
+
+    private BlockingQueue<Programmer> paymentQueue = new LinkedBlockingDeque<>(),
+                                      dispenseQueue = new LinkedBlockingDeque<>();
 
     private EventProcessor eventProcessor = new EventProcessor();
     private CashRegister cashRegister = new CashRegister(eventProcessor);
     private CoffeeMachine[] coffeeMachines;
+
+    private Logger logger = LoggerFactory.getLogger(CoffeeModeling.class);
 
     public CoffeeModeling() {
         /* initialize the worker threads */
@@ -59,7 +64,7 @@ public class CoffeeModeling {
 
             eventProcessor.processEvents();
         } catch (Exception e) {
-            System.err.println("Error during execution: " + e);
+            logger.error("Error during execution: ", e);
         } finally {
             shutdown();
         }
@@ -82,7 +87,7 @@ public class CoffeeModeling {
         return () -> {
             programmer.markServiceStart();
 
-            System.out.println("Selecting coffee...");
+            logger.debug("Selecting coffee...");
             programmer.selectFavouriteCoffee( CoffeeMachine.getCoffeeTypes() );
             /* send him to the payment queue */
             paymentQueue.offer(programmer);
@@ -99,16 +104,16 @@ public class CoffeeModeling {
                     Programmer programmer = paymentQueue.take();
 
                     /* the payment operation itself */
-                    System.out.println("Paying...");
+                    logger.debug("Paying...");
                     cashRegister.pay( programmer.getPaymentType() );
 
                     /* send this guy to the dispense queue */
                     dispenseQueue.offer( programmer );
                 }
             } catch (InterruptedException ie) {
-                System.out.println("Payment worker thread interrupted.");
+                logger.info("Payment worker thread interrupted.");
             }
-            System.out.println("Payment worker thread stopped.");
+            logger.info("Payment worker thread stopped.");
         };
     }
 
@@ -122,7 +127,7 @@ public class CoffeeModeling {
                     /* take next guy from the dispense queue */
                     Programmer programmer = dispenseQueue.take();
 
-                    System.out.println("Picking coffee...");
+                    logger.debug("Picking coffee...");
                     /* 1. First - the programmer looks for a cup */
                     Cup cup = programmer.findCup();
 
@@ -130,7 +135,7 @@ public class CoffeeModeling {
                     CoffeeMachine coffeeMachine = coffeeMachines[random.nextInt(coffeeMachines.length)];
                     cup = coffeeMachine.pourCoffee( cup, programmer.getSelectedCoffee() );
 
-                    System.out.println("Leaving...");
+                    logger.debug("Leaving...");
                     /* 3. Finally he takes the cup and leaves */
                     programmer.takeTheCupAndLeave( cup );
 
@@ -140,9 +145,9 @@ public class CoffeeModeling {
                     eventProcessor.submitEvent(new CustomerServised(programmer.getServiceStart(), DateTime.now()));
                 }
             } catch (InterruptedException ie) {
-                System.out.println("Pick Coffee worker thread interrupted.");
+                logger.info("Pick Coffee worker thread interrupted.");
             }
-            System.out.println("Pick Coffee worker thread stopped.");
+            logger.info("Pick Coffee worker thread stopped.");
         };
     }
 
