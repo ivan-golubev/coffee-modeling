@@ -8,7 +8,14 @@ import net.ivango.entities.CoffeeType;
 public class CupDispensed implements Event {
 
     private CoffeeType coffeeType;
-    public CupDispensed(CoffeeType coffeeType) { this.coffeeType = coffeeType; }
+    private int coffeeMachineNumber;
+
+    public CupDispensed(CoffeeType coffeeType, int coffeeMachineNumber) {
+        this.coffeeType = coffeeType;
+        this.coffeeMachineNumber = coffeeMachineNumber;
+    }
 
     public CoffeeType getCoffeeType() { return coffeeType; }
+
+    public int getCoffeeMachineNumber() { return coffeeMachineNumber; }
 }

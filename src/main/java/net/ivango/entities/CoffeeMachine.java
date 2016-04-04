@@ -10,9 +10,10 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
  */
-public class CoffeeMachines {
+public class CoffeeMachine {
 
     private EventProcessor eventProcessor;
+    private int coffeeMachineNumber;
 
     private Map<CoffeeType, Integer> coffeeToDelayMap = ImmutableMap.<CoffeeType, Integer>builder()
             .put(CoffeeType.ESPRESSO, Timeouts.POUR_ESPRESSO_TIMEOUT)
@@ -21,8 +22,9 @@ public class CoffeeMachines {
             .put(CoffeeType.CAPPUCCINO, Timeouts.POUR_CAPPUCHINO_TIMEOUT)
             .build();
 
-    public CoffeeMachines(EventProcessor eventProcessor) {
+    public CoffeeMachine(EventProcessor eventProcessor, int coffeeMachineNumber) {
         this.eventProcessor = eventProcessor;
+        this.coffeeMachineNumber = coffeeMachineNumber;
     }
 
     public Cup pourCoffee(Cup cup, CoffeeType coffeeType) throws InterruptedException {
@@ -31,9 +33,9 @@ public class CoffeeMachines {
         /* wait till the cup is filled */
         TimeUnit.MILLISECONDS.sleep(coffeeToDelayMap.get(coffeeType));
 
-        eventProcessor.submitEvent( new CupDispensed(coffeeType) );
+        eventProcessor.submitEvent( new CupDispensed(coffeeType, coffeeMachineNumber) );
         return cup;
     }
 
-    public CoffeeType[] getCoffeeTypes() { return CoffeeType.values(); }
+    public static CoffeeType[] getCoffeeTypes() { return CoffeeType.values(); }
 }
