@@ -76,14 +76,14 @@ public class EventProcessor {
             long espressoCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.ESPRESSO) ).count();
             long latteCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.LATTE)).count();
             long macchiatoCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.MACCHIATO) ).count();
-            long cappuchinoCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.CAPPUCCINO)).count();
+            long CappuccinoCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.CAPPUCCINO)).count();
 
             sb.append("##Coffee machine ").append(machineNumber).append("\n\n")
                     .append("Total cups dispensed: ").append(totalCupsDispensed).append("\n\n")
                     .append("Espresso dispensed: ").append(espressoCupsDispensed).append("\n\n")
                     .append("Latte dispensed: ").append(latteCupsDispensed).append("\n\n")
                     .append("Macchiato dispensed: ").append(macchiatoCupsDispensed).append("\n\n")
-                    .append("Cappuchino dispensed: ").append(cappuchinoCupsDispensed).append("\n\n\n\n");
+                    .append("Cappuccino dispensed: ").append(CappuccinoCupsDispensed).append("\n\n\n\n");
         }
         return sb.toString();
     }

@@ -23,8 +23,8 @@ public class CoffeeMachine {
     private Map<CoffeeType, Integer> coffeeToDelayMap = ImmutableMap.<CoffeeType, Integer>builder()
             .put(CoffeeType.ESPRESSO, Config.get(POUR_ESPRESSO_TIMEOUT))
             .put(CoffeeType.LATTE, Config.get(POUR_LATTE_TIMEOUT))
-            .put(CoffeeType.MACCHIATO, Config.get(POUR_MACCIATTO_TIMEOUT))
-            .put(CoffeeType.CAPPUCCINO, Config.get(POUR_CAPPUCHINO_TIMEOUT))
+            .put(CoffeeType.MACCHIATO, Config.get(POUR_MACCHIATTO_TIMEOUT))
+            .put(CoffeeType.CAPPUCCINO, Config.get(POUR_CAPPUCCINO_TIMEOUT))
             .build();
 
     public CoffeeMachine(EventProcessor eventProcessor, int coffeeMachineNumber) {

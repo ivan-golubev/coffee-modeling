@@ -33,14 +33,15 @@ public class CoffeeModeling {
     private CoffeeMachine[] coffeeMachines;
 
     private Logger logger = LoggerFactory.getLogger(CoffeeModeling.class);
+    private Random random = new Random();
 
     public CoffeeModeling() {
         /* read the configuration */
         Config.init();
 
         /* initialize the components */
-        cashRegister = new CashRegister(eventProcessor);
         eventProcessor = new EventProcessor();
+        cashRegister = new CashRegister(eventProcessor);
         /* initialize the coffee machines */
         coffeeMachines = new CoffeeMachine[Config.get(PICK_COFFEE_PARALLELISM)];
         for (int i=0; i < Config.get(PICK_COFFEE_PARALLELISM); i++) { coffeeMachines[i] = new CoffeeMachine(eventProcessor, i+1); }
@@ -125,8 +126,6 @@ public class CoffeeModeling {
             logger.info("Payment worker thread stopped.");
         };
     }
-
-    private Random random = new Random();
 
     private Runnable pickCoffeeTask() {
         return () -> {
