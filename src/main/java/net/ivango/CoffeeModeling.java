@@ -25,6 +25,8 @@ public class CoffeeModeling {
     private ExecutorService paymentThreadPool = Executors.newFixedThreadPool(PAYMENT_PARALLELISM);
     private ExecutorService pickCoffeeThreadPool = Executors.newFixedThreadPool(PICK_COFFEE_PARALLELISM);
 
+    private CountDownLatch doneSignal;
+
     private EventProcessor eventProcessor = new EventProcessor();
     private CashRegister cashRegister = new CashRegister(eventProcessor);
     private CoffeeMachines coffeeMachines = new CoffeeMachines(eventProcessor);
@@ -93,7 +95,10 @@ public class CoffeeModeling {
                     /* 3. Finally he takes the cup and leaves */
                     programmer.takeTheCupAndLeave( cup );
 
-                    eventProcessor.submit( new CustomerServised( programmer.getServiceStart(), DateTime.now() ) );
+                    /* mark the completion of this task */
+                    doneSignal.countDown();
+
+                    eventProcessor.submitEvent(new CustomerServised(programmer.getServiceStart(), DateTime.now()));
                 }
             } catch (InterruptedException ie) {
                 System.out.println("Pick Coffee worker thread interrupted.");
@@ -104,6 +109,7 @@ public class CoffeeModeling {
 
     public void launch(List<Programmer> arrivedCustomers) {
         try {
+            doneSignal = new CountDownLatch(arrivedCustomers.size());
             /* 1. First all the programmers select their favourite coffee */
             coffeeSelectionThreadPool.invokeAll(
                     arrivedCustomers.stream().map(this::selectCoffeeTask).collect(Collectors.toList())
@@ -113,6 +119,7 @@ public class CoffeeModeling {
             /* 3. Then they pick the coffee and leave - done via worker threads plus blocking queue */
 
             /* Once all the work is complete - gather the stats */
+            doneSignal.await();
             eventProcessor.processEvents();
         } catch (Exception e) {}
         finally {

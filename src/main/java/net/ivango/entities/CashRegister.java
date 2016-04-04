@@ -22,7 +22,7 @@ public class CashRegister {
 
     public void pay(PaymentType paymentType) throws InterruptedException {
         TimeUnit.MILLISECONDS.sleep( paymentToDelayMap.get(paymentType) );
-        eventProcessor.submit( new CupSold() );
+        eventProcessor.submitEvent(new CupSold(paymentType));
     }
 
 }

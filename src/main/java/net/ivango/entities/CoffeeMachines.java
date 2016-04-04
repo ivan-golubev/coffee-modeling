@@ -31,7 +31,7 @@ public class CoffeeMachines {
         /* wait till the cup is filled */
         TimeUnit.MILLISECONDS.sleep(coffeeToDelayMap.get(coffeeType));
 
-        eventProcessor.submit( new CupDispensed() );
+        eventProcessor.submitEvent( new CupDispensed(coffeeType) );
         return cup;
     }
 
