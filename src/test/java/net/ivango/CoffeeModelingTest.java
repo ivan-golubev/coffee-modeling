@@ -15,25 +15,25 @@ public class CoffeeModelingTest {
 
     @Test
     public void test100() {
-        CoffeeModeling cm = new CoffeeModeling(queueFiller.generateRandomCustomers(100));
-        cm.launch();
+        CoffeeModeling cm = new CoffeeModeling();
+        cm.launch(queueFiller.generateRandomCustomers(100));
     }
 
-    @Test
+//    @Test
     public void test200() {
-        CoffeeModeling cm = new CoffeeModeling(queueFiller.generateRandomCustomers(200));
-        cm.launch();
+        CoffeeModeling cm = new CoffeeModeling();
+        cm.launch(queueFiller.generateRandomCustomers(200));
     }
 
-    @Test
+//    @Test
     public void test500() {
-        CoffeeModeling cm = new CoffeeModeling(queueFiller.generateRandomCustomers(500));
-        cm.launch();
+        CoffeeModeling cm = new CoffeeModeling();
+        cm.launch(queueFiller.generateRandomCustomers(500));
     }
 
-    @Test
+//    @Test
     public void test1000() {
-        CoffeeModeling cm = new CoffeeModeling(queueFiller.generateRandomCustomers(1000));
-        cm.launch();
+        CoffeeModeling cm = new CoffeeModeling();
+        cm.launch(queueFiller.generateRandomCustomers(1000));
     }
 }
