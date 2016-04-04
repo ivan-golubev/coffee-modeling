@@ -1,7 +1,7 @@
 Modeling the coffee drinking process
 ------------------------------------
 
-Model a system that allows customers to buy coffee.
+Model a system that allows programmers to buy coffee.
 
 Installation
 -------------------------
@@ -16,8 +16,10 @@ Execute this in console or in you favourite IDE:
 
 `> mvn test`
 
-This will model the scenarios with 100, 200, 500 and 1000 customers and 
-print the results to the console.
+This will model the scenarios with 100, 200, 500 and 1000 programmers.
+
+Open generated reports in your favourite browser:
+target/report-100-programmers.html, target/report-200-programmers.html, etc.
 
 [1]: https://github.com/ivan-golubev/coffee-modeling
 [2]: http://www.oracle.com/technetwork/java/javase/downloads

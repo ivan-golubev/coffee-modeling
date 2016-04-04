@@ -1,5 +1,6 @@
 package net.ivango;
 
+import net.ivango.components.QueueFiller;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

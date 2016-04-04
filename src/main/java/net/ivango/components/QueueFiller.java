@@ -1,4 +1,4 @@
-package net.ivango;
+package net.ivango.components;
 
 import net.ivango.entities.PaymentType;
 import net.ivango.entities.Programmer;

@@ -1,7 +1,8 @@
 package net.ivango;
 
-import net.ivango.entities.CashRegister;
-import net.ivango.entities.CoffeeMachine;
+import net.ivango.components.CashRegister;
+import net.ivango.components.CoffeeMachine;
+import net.ivango.config.Config;
 import net.ivango.entities.Cup;
 import net.ivango.entities.Programmer;
 import net.ivango.metrics.EventProcessor;
@@ -15,35 +16,43 @@ import java.util.Random;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+import static net.ivango.config.Properties.*;
+
 /**
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
  */
 public class CoffeeModeling {
 
-    public static final int COFFEE_SELECT_PARALLELISM = 10, PAYMENT_PARALLELISM = 5, PICK_COFFEE_PARALLELISM = 2;
-
-    private ExecutorService coffeeSelectionThreadPool = Executors.newFixedThreadPool(COFFEE_SELECT_PARALLELISM),
-                            paymentThreadPool = Executors.newFixedThreadPool(PAYMENT_PARALLELISM),
-                            pickCoffeeThreadPool = Executors.newFixedThreadPool(PICK_COFFEE_PARALLELISM);
-
+    private ExecutorService coffeeSelectionThreadPool, paymentThreadPool, pickCoffeeThreadPool;
     private CountDownLatch doneSignal;
-
     private BlockingQueue<Programmer> paymentQueue = new LinkedBlockingDeque<>(),
                                       dispenseQueue = new LinkedBlockingDeque<>();
 
-    private EventProcessor eventProcessor = new EventProcessor();
-    private CashRegister cashRegister = new CashRegister(eventProcessor);
+    private EventProcessor eventProcessor;
+    private CashRegister cashRegister;
     private CoffeeMachine[] coffeeMachines;
 
     private Logger logger = LoggerFactory.getLogger(CoffeeModeling.class);
 
     public CoffeeModeling() {
-        /* initialize the worker threads */
-        for (int i=0; i < PAYMENT_PARALLELISM; i++) { paymentThreadPool.submit( paymentTask() ); }
-        for (int i=0; i < PICK_COFFEE_PARALLELISM; i++) { pickCoffeeThreadPool.submit( pickCoffeeTask() ); }
+        /* read the configuration */
+        Config.init();
+
+        /* initialize the components */
+        cashRegister = new CashRegister(eventProcessor);
+        eventProcessor = new EventProcessor();
         /* initialize the coffee machines */
-        coffeeMachines = new CoffeeMachine[PICK_COFFEE_PARALLELISM];
-        for (int i=0; i < PICK_COFFEE_PARALLELISM; i++) { coffeeMachines[i] = new CoffeeMachine(eventProcessor, i+1); }
+        coffeeMachines = new CoffeeMachine[Config.get(PICK_COFFEE_PARALLELISM)];
+        for (int i=0; i < Config.get(PICK_COFFEE_PARALLELISM); i++) { coffeeMachines[i] = new CoffeeMachine(eventProcessor, i+1); }
+
+        /* initialize the executors */
+        coffeeSelectionThreadPool = Executors.newFixedThreadPool(Config.get(COFFEE_SELECT_PARALLELISM));
+        paymentThreadPool = Executors.newFixedThreadPool(Config.get(PAYMENT_PARALLELISM));
+        pickCoffeeThreadPool = Executors.newFixedThreadPool(Config.get(PICK_COFFEE_PARALLELISM));
+
+        /* initialize the worker threads */
+        for (int i=0; i < Config.get(PAYMENT_PARALLELISM); i++) { paymentThreadPool.submit( paymentTask() ); }
+        for (int i=0; i < Config.get(PICK_COFFEE_PARALLELISM); i++) { pickCoffeeThreadPool.submit( pickCoffeeTask() ); }
     }
 
     public void launch(List<Programmer> arrivedCustomers) {

@@ -1,7 +1,7 @@
 package net.ivango.metrics;
 
 import com.github.rjeschke.txtmark.Processor;
-import net.ivango.CoffeeModeling;
+import net.ivango.config.Config;
 import net.ivango.entities.CoffeeType;
 import net.ivango.entities.PaymentType;
 import net.ivango.metrics.events.CupDispensed;
@@ -19,6 +19,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static net.ivango.config.Properties.PICK_COFFEE_PARALLELISM;
 
 /**
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
@@ -68,7 +70,7 @@ public class EventProcessor {
         StringBuilder sb = new StringBuilder();
         sb.append("# Coffee machine stats").append("\n");
 
-        for (int i=0; i < CoffeeModeling.PICK_COFFEE_PARALLELISM; i++) {
+        for (int i=0; i < Config.get(PICK_COFFEE_PARALLELISM); i++) {
             final int machineNumber = i + 1;
             long totalCupsDispensed = cupDispensedEvents.stream().filter( c -> c.getCoffeeMachineNumber() == machineNumber ).count();
             long espressoCupsDispensed = cupDispensedEvents.stream().filter(c -> (c.getCoffeeMachineNumber() == machineNumber && c.getCoffeeType() == CoffeeType.ESPRESSO) ).count();
