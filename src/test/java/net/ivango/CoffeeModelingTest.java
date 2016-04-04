@@ -5,6 +5,9 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
+ * Launches coffee-drinking scenarios with different customer queue capacity.
+ * A separate html report is generated for each scenario.
+ *
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
  */
 public class CoffeeModelingTest {
@@ -20,19 +23,19 @@ public class CoffeeModelingTest {
         cm.launch(queueFiller.generateRandomCustomers(100));
     }
 
-//    @Test
+    @Test
     public void test200() {
         CoffeeModeling cm = new CoffeeModeling();
         cm.launch(queueFiller.generateRandomCustomers(200));
     }
 
-//    @Test
+    @Test
     public void test500() {
         CoffeeModeling cm = new CoffeeModeling();
         cm.launch(queueFiller.generateRandomCustomers(500));
     }
 
-//    @Test
+    @Test
     public void test1000() {
         CoffeeModeling cm = new CoffeeModeling();
         cm.launch(queueFiller.generateRandomCustomers(1000));

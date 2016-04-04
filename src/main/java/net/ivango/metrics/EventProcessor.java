@@ -6,7 +6,7 @@ import net.ivango.entities.CoffeeType;
 import net.ivango.entities.PaymentType;
 import net.ivango.metrics.events.CupDispensed;
 import net.ivango.metrics.events.CupSold;
-import net.ivango.metrics.events.CustomerServised;
+import net.ivango.metrics.events.CustomerServiced;
 import net.ivango.metrics.events.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,38 +23,55 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static net.ivango.config.Properties.PICK_COFFEE_PARALLELISM;
 
 /**
+ * Separate entity used to aggregate events during a simulation
+ * and then to generate a report after the simulation is complete.
+ *
  * Created by Ivan Golubev <igolubev@ea.com> on 4/3/16.
  */
 public class EventProcessor {
 
+    /* events are submitted from multiple threads: collections should be thread-safe */
     private Collection<CupSold> cupSoldEvents = new LinkedBlockingQueue<>();
     private Collection<CupDispensed> cupDispensedEvents = new LinkedBlockingQueue<>();
-    private Collection<CustomerServised> customerServicedEvents = new LinkedBlockingQueue<>();
+    private Collection<CustomerServiced> customerServicedEvents = new LinkedBlockingQueue<>();
 
+    /* file path to store the simulation reports */
     private final static String reportPath = "target/report-%s-programmers.html";
 
     private Logger logger = LoggerFactory.getLogger(EventProcessor.class);
 
+    /**
+     * Sumbits the event for a later report generation.
+     * Thread-safe.
+     * */
     public void submitEvent(Event event) {
         if (event instanceof CupSold) { cupSoldEvents.add((CupSold) event ); }
         else if (event instanceof  CupDispensed) { cupDispensedEvents.add( (CupDispensed) event); }
-        else if (event instanceof CustomerServised) { customerServicedEvents.add( (CustomerServised) event ); }
+        else if (event instanceof CustomerServiced) { customerServicedEvents.add( (CustomerServiced) event ); }
     }
 
+    /**
+     * Replaces the heavy synchronized collections with plain lists for a single-threaded processing.
+     * */
     private void cleanBlockingQueues() {
         cupSoldEvents = new ArrayList<>( cupSoldEvents );
         cupDispensedEvents = new ArrayList<>( cupDispensedEvents );
         customerServicedEvents = new ArrayList<>( customerServicedEvents );
     }
 
+    /**
+     * Processes all the events submitted during the simulation and generates an html report.
+     * */
     public void processEvents() {
         /* thread-safe collection are no longer needed */
         cleanBlockingQueues();
 
+        /* convert the markdown text into html */
         String cupsSoldStats = Processor.process(getCupsSoldStats());
         String coffeeMachineStats = Processor.process(getCoffeeMachineStats());
         String customerWaitStats = Processor.process(getCustomerWaitStats());
 
+        /* write the html report into a file */
         Path outputPath = new File(String.format(reportPath, cupSoldEvents.size())).toPath();
         logger.info("Generating report: " + outputPath);
         try (Writer writer = Files.newBufferedWriter(outputPath, StandardCharsets.UTF_8)) {
@@ -66,6 +83,10 @@ public class EventProcessor {
         }
     }
 
+    /**
+     * Processes relevant events to generate a markdown report text
+     * to describe coffee machine statistics.
+     * */
     private String getCoffeeMachineStats() {
         StringBuilder sb = new StringBuilder();
         sb.append("# Coffee machine stats").append("\n");
@@ -88,10 +109,14 @@ public class EventProcessor {
         return sb.toString();
     }
 
+    /**
+     * Processes relevant events to generate a markdown report text
+     * to describe customer service time statistics.
+     * */
     private String getCustomerWaitStats() {
         long minServiceTime = customerServicedEvents.stream().min((p1, p2) -> Long.compare( p1.getServiceTime(), p2.getServiceTime())).get().getServiceTime();
         long maxServiceTime = customerServicedEvents.stream().max((p1, p2) -> Long.compare(p1.getServiceTime(), p2.getServiceTime())).get().getServiceTime();
-        double avgServiceTime = customerServicedEvents.stream().mapToLong( CustomerServised::getServiceTime ).average().getAsDouble();
+        double avgServiceTime = customerServicedEvents.stream().mapToLong( CustomerServiced::getServiceTime ).average().getAsDouble();
 
         StringBuilder sb = new StringBuilder();
         sb.append("# Service time").append("\n")
@@ -101,6 +126,10 @@ public class EventProcessor {
         return sb.toString();
     }
 
+    /**
+     * Processes relevant events to generate a markdown report text
+     * to describe sold coffee cups statistics.
+     * */
     private String getCupsSoldStats() {
         int totalCupsSold = cupSoldEvents.size();
         long cupsSoldForCash = cupSoldEvents.stream().filter( c -> c.getPaymentType() == PaymentType.CASH).count();

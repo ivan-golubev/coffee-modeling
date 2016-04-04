@@ -21,6 +21,10 @@ This will model the scenarios with 100, 200, 500 and 1000 programmers.
 Open generated reports in your favourite browser:
 target/report-100-programmers.html, target/report-200-programmers.html, etc.
 
+To get a verbose output switch from INFO to DEBUG in src/main/resources/log4j.properties
+
+Levels of parallelism and all the operations delays (timeouts) are all set in src/main/resources/configuration.json
+
 [1]: https://github.com/ivan-golubev/coffee-modeling
 [2]: http://www.oracle.com/technetwork/java/javase/downloads
 [3]: http://maven.apache.org/install.html

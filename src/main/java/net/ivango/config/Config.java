@@ -12,6 +12,10 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
+ * Stores the simulation configuration.
+ * The config is read from the external json file:
+ * src/main/resources/configuration.json
+ *
  * Created by Ivan Golubev <igolubev@ea.com> on 4/4/16.
  */
 public class Config {

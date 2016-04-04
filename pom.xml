@@ -46,7 +46,6 @@
             <version>2.6.2</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.github.rjeschke</groupId>
             <artifactId>txtmark</artifactId>
