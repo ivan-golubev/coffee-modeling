@@ -12,7 +12,7 @@ Installation
 
 Usage
 -----
-Execute this in console or in you favourite IDE:
+Execute this in console (cd to the project root directory first) or in you favourite IDE:
 
 `> mvn test`
 
